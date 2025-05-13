@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Applications</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            color: orange;
+        }
+        .card {
+            background-color: #222;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #333;
+        }
+        .accepted {
+            color: lime;
+            font-weight: bold;
+        }
+        .rejected {
+            color: red;
+        }
+        .pending {
+            color: orange;
+        }
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: orange;
+            color: black;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #440000;
+        }
+    </style>
+    <script>
+        let jobId;
+
+        function getJobIdFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get("jobId");
+        }
+
+        async function fetchApplications() {
+            const container = document.getElementById("applications");
+            jobId = getJobIdFromURL();
+
+            if (!jobId) {
+                container.innerHTML = "<p class='error-message'>No job ID provided in URL.</p>";
+                return;
+            }
+
+            try {
+                const response = await fetch(`AppliedJobsServlet?action=viewApplications&jobId=${jobId}`);
+                const data = await response.json();
+
+                console.log("Job ID:", jobId);
+                console.log("Fetched data:", data);
+
+                container.innerHTML = ""; // Clear previous content
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    container.innerHTML = "<p>No applications found for this job. Please check the job ID.</p>";
+                    return;
+                }
+
+                const hasAccepted = data.some(app => app.status === "Accepted");
+
+                data.forEach(app => {
+                    const div = document.createElement("div");
+                    div.className = "card";
+
+                    let statusClass = app.status.toLowerCase();
+
+                    div.innerHTML = `
+                        <h3>${app.username || "Applicant"}</h3>
+                        <p><strong>Applied for Job ID:</strong> ${app.jobId}</p>
+                        <p><strong>Status:</strong> <span class="${statusClass}">${app.status}</span></p>
+                        <div id="btn-${app.id}">
+                            ${app.status === "Pending" && !hasAccepted ? 
+                                `<button onclick="acceptApplicant(${app.id})">Accept</button>` :
+                                (app.status === "Accepted" ? "<p>Application Accepted</p>" : "")
+                            }
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+
+            } catch (error) {
+                container.innerHTML = `<p class='error-message'>Error fetching applications: ${error.message}. Please try again later.</p>`;
+            }
+        }
+
+        function acceptApplicant(applicationId) {
+            if (!confirm("Are you sure you want to accept this applicant? This action is irreversible.")) return;
+
+            window.location.href = `AppliedJobsServlet?action=acceptApplicant&applicationId=${applicationId}&jobId=${jobId}`;
+        }
+
+        window.onload = () => {
+            jobId = getJobIdFromURL();
+            document.getElementById("jobId").innerText = jobId || "N/A";
+            fetchApplications();
+        };
+    </script>
+</head>
+<body>
+    <h1>Applications for Job ID: <span id="jobId"></span></h1>
+    <div id="applications"></div>
+</body>
+</html>
