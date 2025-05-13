@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile Information</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    background: #0d1117;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 50%;
+    margin: 50px auto;
+    padding: 30px;
+    background: #161b22;
+    border-radius: 12px;
+    box-shadow: 0px 4px 20px rgba(255, 87, 34, 0.4);
+}
+
+h1, h2 {
+    color: orange;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.profile-info {
+    text-align: left;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(255, 87, 34, 0.3);
+    border-radius: 10px;
+    border-left: 5px solid orange;
+}
+
+.profile-info p {
+    font-size: 1.2rem;
+    margin: 8px 0;
+    color: white;
+}
+
+.form-section {
+    border-top: 2px solid orange;
+    padding-top: 25px;
+    margin-top: 40px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 8px;
+    color: orange;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid orange;
+    border-radius: 6px;
+    background: #21262d;
+    color: white;
+    font-size: 1rem;
+    transition: all 0.3s;
+    outline: none;
+}
+
+input:focus {
+    border-color: #ff4500;
+    box-shadow: 0 0 10px rgba(255, 87, 34, 0.6);
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+button {
+    background: orange;
+    color: black;
+    padding: 12px;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 48%;
+    font-weight: bold;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+button:hover {
+    background: #ff4500;
+    transform: scale(1.05);
+}
+
+.logout-btn {
+    background: crimson;
+}
+
+.logout-btn:hover {
+    background: darkred;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
+    .buttons {
+        flex-direction: column;
+    }
+    button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}
+.home-btn {
+    background: #ff8c00;
+}
+
+.home-btn:hover {
+    background: #e07b00;
+}
+
+
+    </style>
+</head>
+<body>
+
+    <h1>My Account</h1>
+    <div class="container">
+        <div class="profile-info">
+            <p><strong>Full Name:</strong> <span id="fullName"></span></p>
+            <p><strong>Username:</strong> <span id="username"></span></p>
+            <p><strong>Email:</strong> <span id="email"></span></p>
+        </div>
+
+        <!-- Edit Profile Section Now Below Profile Information -->
+        <div class="form-section">
+            <h2>Edit Profile</h2>
+            <form id="updateForm">
+                <div class="form-group">
+                    <label for="newFullName">New Full Name</label>
+                    <input type="text" id="newFullName" placeholder="Enter new full name">
+                </div>
+                <div class="form-group">
+                    <label for="newUsername">New Username</label>
+                    <input type="text" id="newUsername" placeholder="Enter new username">
+                </div>
+                <div class="form-group">
+                    <label for="newEmail">New Email</label>
+                    <input type="email" id="newEmail" placeholder="Enter new email">
+                </div>
+
+                <div class="buttons">
+                    <button type="submit">Update Profile</button>
+                     <button class="home-btn" onclick="goToHome()">Go to Home</button>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+
+        function checkLoginStatus() {
+            fetch("AuthServlet?action=getUserInfo", {
+                method: "GET",
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.user_id) {
+                    currentUser = data.user_id;
+                    document.getElementById("fullName").innerText = data.full_name;
+                    document.getElementById("username").innerText = data.username;
+                    document.getElementById("email").innerText = data.email;
+                } else {
+                    window.location.href = "login.html";
+                }
+            });
+        }
+
+        document.getElementById("updateForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let newFullName = document.getElementById("newFullName").value.trim();
+            let newUsername = document.getElementById("newUsername").value.trim();
+            let newEmail = document.getElementById("newEmail").value.trim();
+
+            fetch("AuthServlet?action=updateProfile", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `user_id=${currentUser}&full_name=${newFullName}&username=${newUsername}&email=${newEmail}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || data.error);
+                if (!data.error) {
+                	window.location.href = "home.html";
+                }
+            });
+        });
+
+        function goToHome() {
+            window.location.href = "home.html";
+        }
+
+        function logout() {
+            fetch("AuthServlet?action=logout", {
+                method: "POST",
+                credentials: "include"
+            })
+            .then(() => {
+                sessionStorage.clear();
+                window.location.href = "home.html";
+            });
+        }
+
+        checkLoginStatus();
+    </script>
+
+</body>
+</html>

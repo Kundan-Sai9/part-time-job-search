@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Applications</title>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            color: orange;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .job-block {
+            margin-bottom: 40px;
+            border-bottom: 2px solid #444;
+            padding-bottom: 20px;
+        }
+        .job-title {
+            font-size: 1.5rem;
+            color: gold;
+            margin-bottom: 10px;
+        }
+        .card {
+            background-color: #222;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 0 8px #333;
+        }
+        .accepted {
+            color: lime;
+            font-weight: bold;
+        }
+        .rejected {
+            color: red;
+        }
+        .pending {
+            color: orange;
+        }
+        button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            background: orange;
+            color: black;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        button:disabled {
+            background: gray;
+            cursor: not-allowed;
+        }
+    </style>
+    <script>
+        async function fetchAllApplications() {
+            const container = document.getElementById("all-jobs");
+            container.innerHTML = "<p>Loading...</p>";
+
+            try {
+                const res = await fetch("AppliedJobsServlet?action=getAllPostedApplications", {
+                    credentials: "include"
+                });
+                const data = await res.json();
+
+                container.innerHTML = "";
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    container.innerHTML = "<p>No jobs or applications found.</p>";
+                    return;
+                }
+
+                data.forEach(job => {
+                    const div = document.createElement("div");
+                    div.className = "job-block";
+
+                    const hasAccepted = job.applicants.some(app => app.status === "Accepted");
+
+                    div.innerHTML = `<div class='job-title'>${job.job_title} (Job ID: ${job.job_id})</div>`;
+
+                    job.applicants.forEach(app => {
+                        const appDiv = document.createElement("div");
+                        appDiv.className = "card";
+
+                        appDiv.innerHTML = `
+                            <p><strong>User:</strong> ${app.username}</p>
+                            <p><strong>Status:</strong> <span class="${app.status.toLowerCase()}">${app.status}</span></p>
+                            <div>
+                                ${
+                                    app.status === "Pending" && !hasAccepted
+                                    ? `<button onclick="acceptApplicant(${app.application_id}, ${job.job_id})">Accept</button>`
+                                    : (app.status === "Accepted" ? `<p class="accepted">Accepted</p>` : "")
+                                }
+                            </div>
+                        `;
+
+                        div.appendChild(appDiv);
+                    });
+
+                    container.appendChild(div);
+                });
+
+            } catch (error) {
+                container.innerHTML = `<p style="color:red;">Failed to load data: ${error.message}</p>`;
+            }
+        }
+
+        function acceptApplicant(appId, jobId) {
+            if (!confirm("Accept this applicant? This action is final.")) return;
+            window.location.href = `AppliedJobsServlet?action=acceptApplicant&applicationId=${appId}&jobId=${jobId}`;
+        }
+
+        window.onload = fetchAllApplications;
+    </script>
+</head>
+<body>
+    <h1>All Applications for Your Posted Jobs</h1>
+    <div id="all-jobs"></div>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: black;
+            margin: 0;
+            padding: 0;
+            color: white;
+        }
+        header {
+            background: #ff5722;
+            width: 100%;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 4px 10px rgba(255, 87, 34, 0.5);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 20px;
+        }
+        .logo-img {
+            width: 100px;
+            height: auto;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+        nav ul li a:hover {
+            color: black;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            text-align: center;
+            color: orange;
+            margin-bottom: 40px;
+        }
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        .card {
+            background-color: #222;
+            padding: 20px;
+            border-radius: 10px;
+            width: 260px;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(255, 69, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+        .card h2 {
+            color: #ff4500;
+            font-size: 2.5rem;
+        }
+        .label {
+            color: #ccc;
+            font-size: 1.2rem;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="nav-container">
+        <img src="part-time.png" alt="logo" class="logo-img">
+        <nav>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="jobpost.html">Post Job</a></li>
+                <li><a href="account.html">Edit</a></li>
+                <li><a href="Appliedjobs.html">Applied Jobs</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li id="auth-menu"><a href="login.html" id="auth-link">Login</a></li>
+                <li id="logout-menu" style="display: none;"><a href="#" onclick="logoutUser()">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div id="details" style="margin-top: 40px; padding: 20px;"></div>
+
+<main class="container">
+    <h1>Your Dashboard</h1>
+    <div class="stats" id="stats"></div>
+</main>
+
+<!-- POSTER: All Applications Section -->
+<section id="allApplicationsSection" style="display: none; padding: 20px;">
+    <h2 style="color: orange;">All Applications for Your Posted Jobs</h2>
+    <div id="all-jobs"></div>
+</section>
+
+<!-- APPLICANT: Applied Jobs Section -->
+<section id="appliedJobsSection" style="display: none; padding: 20px;">
+    <h2 style="color: gold;">Your Applied Jobs</h2>
+    <ul id="appliedJobsList" style="list-style: none; padding: 0;"></ul>
+</section>
+
+<script>
+let currentUser = null;
+
+function logoutUser() {
+    fetch("AuthServlet", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "action=logout",
+        credentials: "include"
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.href = "home.html";
+        } else {
+            alert("Logout failed.");
+        }
+    });
+}
+
+function checkLoginStatus() {
+    fetch("AuthServlet?action=getUserInfo", {
+        method: "GET",
+        credentials: "include"
+    })
+    .then(response => response.json())
+    .then(data => {
+        let authMenu = document.getElementById("auth-menu");
+        let logoutMenu = document.getElementById("logout-menu");
+
+        if (data.user_id) {
+            currentUser = data.user_id;
+            authMenu.innerHTML = `<div><a href="#" id="account-link">${data.full_name}</a></div>`;
+            logoutMenu.style.display = "inline";
+            loadDashboard();
+        } else {
+            logoutMenu.style.display = "none";
+            window.location.href = "login.html";
+        }
+    });
+}
+
+function fetchAllApplications() {
+    const container = document.getElementById("all-jobs");
+    container.innerHTML = "<p>Loading...</p>";
+
+    fetch("AppliedJobsServlet?action=getAllPostedApplications", {
+        credentials: "include"
+    })
+    .then(res => res.json())
+    .then(data => {
+        container.innerHTML = "";
+
+        if (!Array.isArray(data) || data.length === 0) {
+            container.innerHTML = "<p>No jobs or applications found.</p>";
+            return;
+        }
+
+        data.forEach(job => {
+            const div = document.createElement("div");
+            div.className = "job-block";
+            div.style.borderBottom = "2px solid #444";
+            div.style.marginBottom = "30px";
+            div.style.paddingBottom = "10px";
+
+            const hasAccepted = job.applicants.some(app => app.status === "Accepted");
+
+            div.innerHTML = `<div class='job-title' style="font-size:1.3rem;color:gold;margin-bottom:10px;">
+                ${job.job_title} (Job ID: ${job.job_id})</div>`;
+
+            job.applicants.forEach(app => {
+                const appDiv = document.createElement("div");
+                appDiv.className = "card";
+                appDiv.style.background = "#222";
+                appDiv.style.padding = "15px";
+                appDiv.style.borderRadius = "8px";
+                appDiv.style.marginBottom = "10px";
+
+                appDiv.innerHTML = `
+                    <p><strong>User:</strong> ${app.username}</p>
+                    <p><strong>Status:</strong> <span style="color:${
+                        app.status === "Accepted" ? "lime" :
+                        app.status === "Rejected" ? "red" : "orange"
+                    }">${app.status}</span></p>
+                    ${
+                        app.status === "Pending" && !hasAccepted
+                        ? `<button onclick="acceptApplicant(${app.application_id}, ${job.job_id})">Accept</button>`
+                        : app.status === "Accepted" ? `<p style="color:lime;font-weight:bold;">Accepted</p>` : ""
+                    }
+                `;
+                div.appendChild(appDiv);
+            });
+
+            container.appendChild(div);
+        });
+    });
+}
+
+function acceptApplicant(appId, jobId) {
+    if (!confirm("Accept this applicant? This action is final.")) return;
+    fetch(`AppliedJobsServlet?action=acceptApplicant&applicationId=${appId}&jobId=${jobId}`, {
+        credentials: "include"
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) fetchAllApplications();
+        else alert(data.error || "Error accepting applicant.");
+    });
+}
+
+function fetchAppliedJobs() {
+    fetch("AuthServlet?action=getUserInfo", {
+        credentials: "include"
+    })
+    .then(res => res.json())
+    .then(user => {
+        if (!user.user_id) return;
+
+        fetch("AuthServlet", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `action=getAppliedJobs&user_id=${user.user_id}`,
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            const jobList = document.getElementById("appliedJobsList");
+            jobList.innerHTML = "";
+
+            if (data.jobs && data.jobs.length > 0) {
+                data.jobs.forEach(job => {
+                    const li = document.createElement("li");
+                    li.style.background = "#222";
+                    li.style.padding = "10px";
+                    li.style.border = "1px solid gold";
+                    li.style.borderRadius = "6px";
+                    li.style.marginBottom = "10px";
+                    li.innerText = `${job.title} at ${job.company} (${job.status})`;
+                    jobList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement("li");
+                li.innerText = "No jobs applied yet.";
+                jobList.appendChild(li);
+            }
+        });
+    });
+}
+
+async function loadDashboard() {
+    const res = await fetch("AuthServlet", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: "action=dashboard",
+        credentials: "include"
+    });
+
+    const data = await res.json();
+    const statsDiv = document.getElementById("stats");
+    statsDiv.innerHTML = "";
+
+    function card(value, label) {
+        return `<div class="card"><h2>${value}</h2><div class="label">${label}</div></div>`;
+    }
+
+    if (data.role === "poster") {
+        statsDiv.innerHTML += card(data.jobs_posted, "Jobs Posted");
+        statsDiv.innerHTML += card(data.total_applicants, "Applicants");
+        statsDiv.innerHTML += card(data.total_accepted, "Accepted");
+
+        document.getElementById("allApplicationsSection").style.display = "block";
+        fetchAllApplications();
+    } else {
+        statsDiv.innerHTML += card(data.applied, "Jobs Applied");
+        statsDiv.innerHTML += card(data.pending, "Pending");
+        statsDiv.innerHTML += card(data.accepted, "Accepted");
+        statsDiv.innerHTML += card(data.rejected, "Rejected");
+
+        document.getElementById("appliedJobsSection").style.display = "block";
+        fetchAppliedJobs();
+    }
+}
+
+checkLoginStatus();
+</script>
+
+</body>
+</html>

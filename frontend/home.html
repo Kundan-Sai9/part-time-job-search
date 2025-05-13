@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: black;
+            margin: 0;
+            padding: 0;
+            color: white;
+        }
+        header {
+            background: #ff5722;
+            width:100%;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 4px 10px rgba(255, 87, 34, 0.5);
+        }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 20px;
+        }
+        .logo-img {
+            width: 100px;
+            height: auto;
+        }
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+        nav ul li {
+            position: relative;
+           
+        }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
+        nav ul li a:hover {
+            color: black;
+        }
+        
+        .content {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .content h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        .content p {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 50px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .card {
+    background-color: #222;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(255, 69, 0, 0.5);
+    text-align: center;
+    width: 300px;
+    margin: 15px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+        .card .title {
+    font-size: 22px;
+    color: #ff4500;
+    font-weight: bold;
+}
+
+        .card .action {
+    background-color: #ff4500;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin-top: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+        .card .action:hover {
+            background: #e64a19;
+        }
+        .search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px; /* Adds space between elements */
+    margin: 30px auto;
+    padding: 10px;
+    max-width: 800px;
+    flex-wrap: wrap; /* Makes it wrap on smaller screens */
+}
+
+.search-container input {
+    flex: 1;
+    min-width: 200px; /* Ensures inputs don't shrink too much */
+    padding: 12px 15px;
+    font-size: 1rem;
+    border: 2px solid #ff5722;
+    border-radius: 25px;
+    outline: none;
+    background: #222;
+    color: white;
+}
+
+.search-container button {
+    padding: 12px 20px;
+    font-size: 1rem;
+    background: #ff5722;
+    color: white;
+    border: 2px solid #ff5722;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background 0.3s;
+    white-space: nowrap;
+}
+
+.search-container button:hover {
+    background: #e64a19;
+}
+.applied-jobs-section {
+    text-align: left;
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 8px;
+}
+
+.applied-jobs-section h2 {
+    color: gold;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.applied-jobs-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.applied-jobs-section li {
+    padding: 10px;
+    margin-bottom: 10px;
+    background: #222;
+    border: 1px solid gold;
+    border-radius: 6px;
+    color: white;
+    font-size: 1rem;
+}
+.apply-btn {
+    background-color: #ff5722;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+.apply-btn:hover {
+    background-color: #e64a19;
+}
+
+
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <img src="part-time.png" alt="logo" class="logo-img">
+            <nav>
+                <ul>
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="jobpost.html">Post Job</a></li>
+                    <li><a href="account.html">Edit</a></li>
+                    <li><a href="Appliedjobs.html">Applied Jobs</a></li>
+                   <!-- <li><a href="all_applications.html">View</a></li>-->
+                    <li><a href="dashboard.html">Dashboard</a></li>
+                    <li id="auth-menu">
+                        <a href="login.html" id="auth-link">Login</a>
+                    </li>
+                    <li id="logout-menu" style="display: none;">
+    				<a href="#" class="nav-link" onclick="logoutUser()">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <main>
+
+        <section class="content">
+            <h1>Welcome to Our Job Search Portal</h1>
+            <p>Find the best opportunities that match your skills.</p>
+        </section>
+        <div class="search-container">
+    <input type="text" id="search-input" placeholder="Search jobs...">
+    <button onclick="searchJobs()">Search</button>
+</div>
+        <div class="container" id="jobs-container">
+            <!-- Jobs will be loaded here dynamically from the backend -->
+        </div>
+       
+        
+    </main>
+
+    <script>
+    	
+        let currentUser = null;
+
+        function checkLoginStatus() {
+            fetch("AuthServlet?action=getUserInfo", {
+                method: "GET",
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                let authMenu = document.getElementById("auth-menu");
+                let logoutMenu = document.getElementById("logout-menu");
+
+                if (data.user_id) { 
+                    currentUser = data.user_id;
+                    authMenu.innerHTML = `
+                        <div>
+                            <a href="#" id="account-link">${data.full_name}</a>
+                        </div>
+                    `;
+                    logoutMenu.style.display = "inline"; 
+                } else {
+                    logoutMenu.style.display = "none";
+                }
+            })
+            .catch(error => console.error("Error checking login status:", error));
+        }
+
+        function fetchAppliedJobs() {
+            fetch(`AuthServlet?action=getAppliedJobs&user_id=${currentUser}`, {
+                method: "GET",
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                let jobList = document.getElementById("appliedJobsList");
+                jobList.innerHTML = ""; // Clear existing list
+
+                if (data.jobs && data.jobs.length > 0) {
+                    data.jobs.forEach(job => {
+                        let li = document.createElement("li");
+                        li.innerText = `${job.title} at ${job.company} - ${job.status}`;
+                        jobList.appendChild(li);
+                    });
+                } else {
+                    let li = document.createElement("li");
+                    li.innerText = "No jobs applied yet.";
+                    jobList.appendChild(li);
+                }
+            })
+            .catch(error => console.error('Error fetching applied jobs:', error));
+        }
+
+        function logout() {
+            fetch("AuthServlet?action=logout", {
+                method: "POST",
+                credentials: "include"
+            })
+            .then(() => {
+                sessionStorage.clear();
+                window.location.href = "home.html";
+            });
+        }
+
+        function loadJobs() {
+            fetch("JobServlet")
+                .then(response => response.text()) 
+                .then(data => {
+                    let jobContainer = document.getElementById("jobs-container");
+
+                    if (!jobContainer) {
+                        console.error("Error: #jobs-container not found.");
+                        return;
+                    }
+
+                    if (data.trim().length === 0) {
+                        jobContainer.innerHTML = `<p style="color:white; text-align:center;">No jobs found.</p>`;
+                    } else {
+                        // Wrap jobs in a flex container for better layout
+                        jobContainer.innerHTML = `<div style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">${data}
+                        </div>`;
+                    }
+                })
+                .catch(error => console.error("Error fetching jobs:", error));
+        }
+        function approveJob(jobId) {
+            fetch("JobServlet", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `action=approveJob&job_id=${jobId}`,
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || "Job approved successfully!");
+                loadJobs();
+            })
+            .catch(error => console.error("Error approving job:", error));
+        }
+
+
+        function searchJobs() {
+            let searchQuery = document.getElementById("search-input").value.trim();
+            
+            let queryParams = new URLSearchParams();
+            if (searchQuery) queryParams.append("search", searchQuery);
+
+            let requestURL = `JobServlet?${queryParams.toString()}`;
+            console.log("Fetching jobs from:", requestURL);
+
+            fetch(requestURL)
+                .then(response => response.json())
+                .then(data => {
+                    let jobContainer = document.getElementById("jobs-container");
+                    jobContainer.innerHTML = "";
+
+                    if (data.length === 0) {
+                        jobContainer.innerHTML = `<p style="color:white; text-align:center;">No jobs found.</p>`;
+                        return;
+                    }
+
+                    data.forEach(job => {
+                        let jobCard = document.createElement("div");
+                        jobCard.classList.add("card");
+
+                        let actions = `
+                            <button class="action" onclick="applyForJob(${job.job_id})">Apply</button>
+                        `;
+
+                        // If user is the poster (we assume currentUser is the job poster ID)
+                        if (currentUser === job.posted_by) {
+                            actions += `
+                                <br><br>
+                                <a href="all_applications.html?jobId=${job.job_id}" style="color:gold; text-decoration:underline;">
+                                    View Applications
+                                </a>
+                            `;
+                        }
+
+                        jobCard.innerHTML = `
+                            <h2 class="title">${job.title}</h2>
+                            <p><strong>Company:</strong> ${job.company}</p>
+                            <p><strong>Location:</strong> ${job.location}</p>
+                            <p><strong>Salary:</strong> ${job.salary}</p>
+                            <p>${job.description}</p>
+                            ${actions}
+                        `;
+
+                        jobContainer.appendChild(jobCard);
+                    });
+
+                })
+                .catch(error => console.error("Error fetching jobs:", error));
+        }
+
+
+
+        function applyForJob(jobId) {
+            if (!currentUser) {
+                alert("You must be logged in to apply for a job.");
+                return;
+            }
+
+            console.log("Applying for job:", jobId, "User ID:", currentUser);
+
+            fetch("JobServlet", {
+                method: "POST",
+                body: new URLSearchParams({ job_id: jobId, user_id: currentUser }),
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            })
+            .then(response => response.json()) 
+            .then(data => {
+                if (data.error) {
+                    alert("Error: " + data.error);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error("Error applying:", error));
+        }
+        function logoutUser() {
+            fetch("AuthServlet", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "action=logout",
+                credentials: "include"
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = "home.html";
+                } else {
+                    alert("Logout failed. Try again.");
+                }
+            })
+            .catch(error => console.error("Error logging out:", error));
+        }
+
+
+        checkLoginStatus();
+        loadJobs();
+    </script>
+
+</body>
+</html>

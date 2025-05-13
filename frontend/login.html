@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Signup and Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: black;
+            color: white;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 50px;
+            color: gold;
+        }
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .form-section {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(255, 215, 0, 0.5);
+            display: none; /* Hide by default */
+        }
+        .form-section.active {
+            display: block; /* Show the active form */
+        }
+        input {
+            background: black;
+            color: white;
+            border: 1px solid gold;
+            padding: 10px;
+            margin: 10px;
+            width: 90%;
+            border-radius: 5px;
+        }
+        button {
+            background: gold;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: darkgoldenrod;
+        }
+        .switch-form {
+            margin-top: 20px;
+        }
+        .switch-form a {
+            color: gold;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .switch-form a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome</h1>
+
+    <div class="form-container">
+        <!-- Signup Form -->
+        <div class="form-section signup-form" id="signup-form">
+            <h2>Create Your Account</h2>
+            <form id="signupForm">
+                <input type="text" id="signup-name" placeholder="Full Name" required><br>
+                <input type="text" id="signup-username" placeholder="Username" required><br>
+                <input type="email" id="signup-email" placeholder="Email Address" required><br>
+                <input type="password" id="signup-password" placeholder="Password" required><br>
+                <button type="submit">Sign Up</button>
+            </form>
+            <div class="switch-form">
+                <p>Already have an account? <a href="#" id="to-login">Login here</a></p>
+            </div>
+        </div>
+
+        <!-- Login Form -->
+        <div class="form-section login-form" id="login-form">
+            <h2>Login to Your Account</h2>
+            <form id="loginForm">
+                <input type="text" id="login-input" placeholder="Username or Email" required><br>
+                <input type="password" id="login-password" placeholder="Password" required><br>
+                <button type="submit">Login</button>
+            </form>
+            <div class="switch-form">
+                <p>Don't have an account? <a href="#" id="to-signup">Sign up here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle between signup and login forms
+        const signupForm = document.getElementById('signup-form');
+        const loginForm = document.getElementById('login-form');
+        const toLogin = document.getElementById('to-login');
+        const toSignup = document.getElementById('to-signup');
+
+        toLogin.addEventListener('click', function() {
+            signupForm.classList.remove('active');
+            loginForm.classList.add('active');
+        });
+
+        toSignup.addEventListener('click', function() {
+            loginForm.classList.remove('active');
+            signupForm.classList.add('active');
+        });
+
+        // Show the signup form by default
+        signupForm.classList.add('active');
+
+        // Handle signup submission
+        document.getElementById("signupForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let fullName = document.getElementById("signup-name").value;
+            let username = document.getElementById("signup-username").value;
+            let email = document.getElementById("signup-email").value;
+            let password = document.getElementById("signup-password").value;
+
+            fetch("AuthServlet?action=signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `full_name=${fullName}&username=${username}&email=${email}&password=${password}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message || data.error);
+                if (!data.error) {
+                    loginForm.classList.add('active');
+                    signupForm.classList.remove('active');
+                }
+            });
+        });
+
+        // Handle login submission
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let userInput = document.getElementById("login-input").value;
+            let password = document.getElementById("login-password").value;
+
+            fetch("AuthServlet?action=login", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `user_input=${userInput}&password=${password}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert("Login successful!");
+                    sessionStorage.setItem("user_id", data.user_id);
+                    window.location.href = "home.html";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
