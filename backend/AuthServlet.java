@@ -198,42 +198,78 @@ public class AuthServlet extends HttpServlet {
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+        String confirmPassword = request.getParameter("confirm_password");
+
+        response.setContentType("application/json");
 
         try {
-            Connection conn = DBConnection.getConnection();
-            if (conn == null) {
-                out.println("{\"error\": \"Database connection failed.\"}");
+            // Check if passwords match
+            if (confirmPassword == null || !password.equals(confirmPassword)) {
+                out.println("{\"error\": \"Passwords do not match.\"}");
                 return;
             }
 
-            // Check if email or username is already registered
-            PreparedStatement checkUser = conn.prepareStatement(
-                    "SELECT * FROM users WHERE email = ? OR username = ?");
-            checkUser.setString(1, email);
-            checkUser.setString(2, username);
-            ResultSet rs = checkUser.executeQuery();
-
-            if (rs.next()) {
-                out.println("{\"error\": \"Username or Email already taken.\"}");
+            // Password constraints validation
+            if (password == null || password.length() < 8) {
+                out.println("{\"error\": \"Password must be at least 8 characters long.\"}");
+                return;
+            }
+            if (!password.matches(".*[A-Z].*")) {
+                out.println("{\"error\": \"Password must contain at least one uppercase letter.\"}");
+                return;
+            }
+            if (!password.matches(".*[a-z].*")) {
+                out.println("{\"error\": \"Password must contain at least one lowercase letter.\"}");
+                return;
+            }
+            if (!password.matches(".*\\d.*")) {
+                out.println("{\"error\": \"Password must contain at least one digit.\"}");
+                return;
+            }
+            if (!password.matches(".*[!@#$%^&*()\\-+=<>?{}\\[\\]~].*")) {
+                out.println("{\"error\": \"Password must contain at least one special character (e.g. !@#$%^&*).\"}");
                 return;
             }
 
-            // Insert new user
-            PreparedStatement stmt = conn.prepareStatement(
-                    "INSERT INTO users (full_name, username, email, password) VALUES (?, ?, ?, ?)");
-            stmt.setString(1, fullName);
-            stmt.setString(2, username);
-            stmt.setString(3, email);
-            stmt.setString(4, password);
-            stmt.executeUpdate();
-            conn.close();
+            try (Connection conn = DBConnection.getConnection()) {
+                if (conn == null) {
+                    out.println("{\"error\": \"Database connection failed.\"}");
+                    return;
+                }
 
-            out.println("{\"message\": \"Signup successful! You can now log in.\"}");
+                // Check if email or username is already registered
+                String checkQuery = "SELECT * FROM users WHERE email = ? OR username = ?";
+                try (PreparedStatement checkUser = conn.prepareStatement(checkQuery)) {
+                    checkUser.setString(1, email);
+                    checkUser.setString(2, username);
+
+                    try (ResultSet rs = checkUser.executeQuery()) {
+                        if (rs.next()) {
+                            out.println("{\"error\": \"Username or Email already taken.\"}");
+                            return;
+                        }
+                    }
+                }
+
+                // Insert new user
+                String insertQuery = "INSERT INTO users (full_name, username, email, password) VALUES (?, ?, ?, ?)";
+                try (PreparedStatement stmt = conn.prepareStatement(insertQuery)) {
+                    stmt.setString(1, fullName);
+                    stmt.setString(2, username);
+                    stmt.setString(3, email);
+                    stmt.setString(4, password);
+                    stmt.executeUpdate();
+                }
+
+                out.println("{\"message\": \"Signup successful! You can now log in.\"}");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             out.println("{\"error\": \"Error signing up: " + e.getMessage() + "\"}");
         }
     }
+
+
 
     private void handleLogin(HttpServletRequest request, HttpServletResponse response, PrintWriter out) {
         String userInput = request.getParameter("user_input"); // Can be email or username

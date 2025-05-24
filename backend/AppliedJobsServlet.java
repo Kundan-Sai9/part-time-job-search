@@ -79,6 +79,11 @@ public class AppliedJobsServlet extends HttpServlet {
                     "UPDATE applied_jobs SET status='Accepted' WHERE application_id=?");
                 acceptOne.setInt(1, appId);
                 acceptOne.executeUpdate();
+                
+                PreparedStatement updateJobStatus = conn.prepareStatement(
+                     "UPDATE jobs SET job_status = 'approved' WHERE job_id = ?");
+                updateJobStatus.setInt(1, jobId);
+                updateJobStatus.executeUpdate();
 
                 // Send JSON response instead of redirect
                 response.setContentType("application/json");
@@ -86,6 +91,8 @@ public class AppliedJobsServlet extends HttpServlet {
                 PrintWriter out = response.getWriter();
                 out.print("{\"success\": true, \"message\": \"Applicant accepted\"}");
                 return;
+                
+                
             }else if ("getAllPostedApplications".equals(action)) {
                 int posterId = Integer.parseInt(session.getAttribute("user_id").toString());
 
@@ -104,7 +111,7 @@ public class AppliedJobsServlet extends HttpServlet {
                 ResultSet rs = stmt.executeQuery();
 
                 int currentJobId = -1;
-                String currentJobTitle = "";
+                //String currentJobTitle = "";
                 StringBuilder resultJson = new StringBuilder();
                 resultJson.append("[");
 
@@ -146,9 +153,40 @@ public class AppliedJobsServlet extends HttpServlet {
                 resultJson.append("]");
                 out.print(resultJson.toString());
                 return;
+            }else if ("getApprovedJobs".equals(action)) {
+                int userId = Integer.parseInt(session.getAttribute("user_id").toString());
+
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter out = response.getWriter();
+
+                PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT j.title, j.company, j.location, j.salary " +
+                    "FROM applied_jobs aj " +
+                    "JOIN jobs j ON aj.job_id = j.job_id " +
+                    "WHERE aj.user_id = ? AND aj.status = 'Accepted' AND j.job_status = 'approved'");
+                stmt.setInt(1, userId);
+                ResultSet rs = stmt.executeQuery();
+
+                StringBuilder json = new StringBuilder("[");
+                boolean first = true;
+                while (rs.next()) {
+                    if (!first) json.append(",");
+                    json.append("{");
+                    json.append("\"title\":\"").append(rs.getString("title").replace("\"", "\\\"")).append("\",");
+                    json.append("\"company\":\"").append(rs.getString("company").replace("\"", "\\\"")).append("\",");
+                    json.append("\"location\":\"").append(rs.getString("location").replace("\"", "\\\"")).append("\",");
+                    json.append("\"salary\":").append(rs.getInt("salary"));
+                    json.append("}");
+                    first = false;
+                }
+                json.append("]");
+                out.print(json.toString());
+                return;
             }
 
- else {
+
+            else {
                 // Default: Show current user's applied jobs
                 int userId = Integer.parseInt(session.getAttribute("user_id").toString());
 
