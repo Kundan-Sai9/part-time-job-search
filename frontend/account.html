@@ -1,236 +1,305 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Profile Information</title>
+    <title>My Account</title>
+    <meta charset="UTF-8">
     <style>
         body {
-    font-family: Arial, sans-serif;
-    background: #0d1117;
-    color: white;
-    text-align: center;
-    margin: 0;
-    padding: 0;
-}
+            font-family: Arial, sans-serif;
+            background: black;
+            margin: 0;
+            padding: 0;
+            color: white;
+        }
 
-.container {
-    width: 50%;
-    margin: 50px auto;
-    padding: 30px;
-    background: #161b22;
-    border-radius: 12px;
-    box-shadow: 0px 4px 20px rgba(255, 87, 34, 0.4);
-}
+        header {
+            background: #ff5722;
+            width: 100%;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0px 4px 10px rgba(255, 87, 34, 0.5);
+        }
 
-h1, h2 {
-    color: orange;
-    margin-bottom: 20px;
-    font-weight: bold;
-}
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 20px;
+        }
 
-.profile-info {
-    text-align: left;
-    margin-bottom: 30px;
-    padding: 20px;
-    background: rgba(255, 87, 34, 0.3);
-    border-radius: 10px;
-    border-left: 5px solid orange;
-}
+        .logo-img {
+            width: 100px;
+            height: auto;
+        }
 
-.profile-info p {
-    font-size: 1.2rem;
-    margin: 8px 0;
-    color: white;
-}
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
 
-.form-section {
-    border-top: 2px solid orange;
-    padding-top: 25px;
-    margin-top: 40px;
-}
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: color 0.3s;
+        }
 
-.form-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
+        nav ul li a:hover {
+            color: black;
+        }
 
-label {
-    display: block;
-    font-size: 1rem;
-    margin-bottom: 8px;
-    color: orange;
-    font-weight: bold;
-}
+        main {
+            padding: 40px 20px;
+            max-width: 900px;
+            margin: auto;
+        }
 
-input {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid orange;
-    border-radius: 6px;
-    background: #21262d;
-    color: white;
-    font-size: 1rem;
-    transition: all 0.3s;
-    outline: none;
-}
+        h1, h2 {
+            color: orange;
+            text-align: center;
+        }
 
-input:focus {
-    border-color: #ff4500;
-    box-shadow: 0 0 10px rgba(255, 87, 34, 0.6);
-}
+        .section {
+            margin-top: 40px;
+            padding: 20px;
+            background: #161b22;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(255, 87, 34, 0.4);
+        }
 
-.buttons {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-    gap: 10px;
-}
+        .section label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: gold;
+        }
 
-button {
-    background: orange;
-    color: black;
-    padding: 12px;
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-    font-size: 1rem;
-    width: 48%;
-    font-weight: bold;
-    transition: all 0.3s;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
+        input, textarea {
+            width: 95%;
+            padding: 12px;
+            background: #222;
+            border: 2px solid #ff5722;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
 
-button:hover {
-    background: #ff4500;
-    transform: scale(1.05);
-}
+        textarea {
+            resize: vertical;
+        }
 
-.logout-btn {
-    background: crimson;
-}
+        .button {
+            background: #ff5722;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
 
-.logout-btn:hover {
-    background: darkred;
-}
+        .button:hover {
+            background: #e64a19;
+        }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .container {
-        width: 90%;
-    }
-    .buttons {
-        flex-direction: column;
-    }
-    button {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-}
-.home-btn {
-    background: #ff8c00;
-}
+        .job-card {
+            background: #21262d;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 5px solid gold;
+        }
 
-.home-btn:hover {
-    background: #e07b00;
-}
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+            }
 
-
+            .nav-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
 
+<header>
+    <div class="nav-container">
+        <img src="part-time.png" alt="logo" class="logo-img">
+        <nav>
+            <ul>
+                <li><a href="home.html">Home</a></li>
+                <li><a href="jobpost.html">Post Job</a></li>
+                <li><a href="account.html">Edit</a></li>
+                <li><a href="Appliedjobs.html">Applied Jobs</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li id="auth-menu"><a href="login.html">Login</a></li>
+                <li id="logout-menu" style="display:none;"><a href="#" onclick="logout()">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
     <h1>My Account</h1>
-    <div class="container">
-        <div class="profile-info">
-            <p><strong>Full Name:</strong> <span id="fullName"></span></p>
-            <p><strong>Username:</strong> <span id="username"></span></p>
-            <p><strong>Email:</strong> <span id="email"></span></p>
-        </div>
 
-        <!-- Edit Profile Section Now Below Profile Information -->
-        <div class="form-section">
-            <h2>Edit Profile</h2>
-            <form id="updateForm">
-                <div class="form-group">
-                    <label for="newFullName">New Full Name</label>
-                    <input type="text" id="newFullName" placeholder="Enter new full name">
-                </div>
-                <div class="form-group">
-                    <label for="newUsername">New Username</label>
-                    <input type="text" id="newUsername" placeholder="Enter new username">
-                </div>
-                <div class="form-group">
-                    <label for="newEmail">New Email</label>
-                    <input type="email" id="newEmail" placeholder="Enter new email">
-                </div>
-
-                <div class="buttons">
-                    <button type="submit">Update Profile</button>
-                     <button class="home-btn" onclick="goToHome()">Go to Home</button>
-                    <button class="logout-btn" onclick="logout()">Logout</button>
-                </div>
-            </form>
-        </div>
+    <div class="section">
+        <h2>Profile Info</h2>
+        <p><strong>Full Name:</strong> <span id="fullName"></span></p>
+        <p><strong>Username:</strong> <span id="username"></span></p>
+        <p><strong>Email:</strong> <span id="email"></span></p>
     </div>
 
-    <script>
-        let currentUser = null;
+    <div class="section">
+        <h2>Edit Profile</h2>
+        <form id="updateForm">
+            <label for="newFullName">Full Name</label>
+            <input type="text" id="newFullName">
 
-        function checkLoginStatus() {
-            fetch("AuthServlet?action=getUserInfo", {
-                method: "GET",
-                credentials: "include"
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.user_id) {
-                    currentUser = data.user_id;
-                    document.getElementById("fullName").innerText = data.full_name;
-                    document.getElementById("username").innerText = data.username;
-                    document.getElementById("email").innerText = data.email;
-                } else {
-                    window.location.href = "login.html";
-                }
-            });
-        }
+            <label for="newUsername">Username</label>
+            <input type="text" id="newUsername">
 
-        document.getElementById("updateForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            let newFullName = document.getElementById("newFullName").value.trim();
-            let newUsername = document.getElementById("newUsername").value.trim();
-            let newEmail = document.getElementById("newEmail").value.trim();
+            <label for="newEmail">Email</label>
+            <input type="email" id="newEmail">
 
-            fetch("AuthServlet?action=updateProfile", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `user_id=${currentUser}&full_name=${newFullName}&username=${newUsername}&email=${newEmail}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message || data.error);
-                if (!data.error) {
-                	window.location.href = "home.html";
-                }
+            <button type="submit" class="button">Update Profile</button>
+        </form>
+    </div>
+
+    <div class="section">
+        <h2>My Posted Jobs</h2>
+        <div id="postedJobsList">Loading...</div>
+    </div>
+</main>
+
+<script>
+    let currentUser = null;
+
+    function logout() {
+        fetch("AuthServlet?action=logout", {
+            method: "POST",
+            credentials: "include"
+        }).then(() => {
+            sessionStorage.clear();
+            window.location.href = "home.html";
+        });
+    }
+
+    function checkLoginStatus() {
+        fetch("AuthServlet?action=getUserInfo", {
+            method: "GET",
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.user_id) {
+                currentUser = data.user_id;
+                document.getElementById("fullName").innerText = data.full_name;
+                document.getElementById("username").innerText = data.username;
+                document.getElementById("email").innerText = data.email;
+                document.getElementById("auth-menu").style.display = "none";
+                document.getElementById("logout-menu").style.display = "inline";
+                fetchPostedJobs();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+    }
+
+    document.getElementById("updateForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        const formData = new URLSearchParams();
+        formData.append("user_id", currentUser);
+        formData.append("full_name", document.getElementById("newFullName").value);
+        formData.append("username", document.getElementById("newUsername").value);
+        formData.append("email", document.getElementById("newEmail").value);
+
+        fetch("AuthServlet?action=updateProfile", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString()
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message || data.error);
+            if (!data.error) window.location.reload();
+        });
+    });
+
+    function fetchPostedJobs() {
+        fetch(`JobServlet?action=getJobsByUser&user_id=${currentUser}`, {
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById("postedJobsList");
+            container.innerHTML = "";
+
+            if (!Array.isArray(data) || data.length === 0) {
+                container.innerHTML = "<p>No jobs posted yet.</p>";
+                return;
+            }
+
+            data.forEach(job => {
+                const div = document.createElement("div");
+                div.className = "job-card";
+
+                div.innerHTML = `
+                    <label>Title</label>
+                    <input type="text" id="title-${job.job_id}" value="${job.title}">
+                    <label>Company</label>
+                    <input type="text" id="company-${job.job_id}" value="${job.company}">
+                    <label>Location</label>
+                    <input type="text" id="location-${job.job_id}" value="${job.location}">
+                    <label>Salary</label>
+                    <input type="text" id="salary-${job.job_id}" value="${job.salary}">
+                    <label>Description</label>
+                    <textarea id="description-${job.job_id}">${job.description}</textarea>
+                    <button class="button" onclick="updateJob(${job.job_id})">Save Changes</button>
+                `;
+                container.appendChild(div);
             });
         });
+    }
 
-        function goToHome() {
-            window.location.href = "home.html";
-        }
+    function updateJob(jobId) {
+        const formData = new URLSearchParams();
+        formData.append("action", "updateJob");
+        formData.append("job_id", jobId);
+        formData.append("title", document.getElementById(`title-${jobId}`).value);
+        formData.append("company", document.getElementById(`company-${jobId}`).value);
+        formData.append("location", document.getElementById(`location-${jobId}`).value);
+        formData.append("salary", document.getElementById(`salary-${jobId}`).value);
+        formData.append("description", document.getElementById(`description-${jobId}`).value);
 
-        function logout() {
-            fetch("AuthServlet?action=logout", {
-                method: "POST",
-                credentials: "include"
-            })
-            .then(() => {
-                sessionStorage.clear();
-                window.location.href = "home.html";
-            });
-        }
+        fetch("JobServlet", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString(),
+            credentials: "include"
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message || data.error);
+            if (!data.error) fetchPostedJobs();
+        });
+    }
 
-        checkLoginStatus();
-    </script>
+    checkLoginStatus();
+</script>
 
 </body>
 </html>

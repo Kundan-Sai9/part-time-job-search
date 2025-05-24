@@ -117,12 +117,6 @@
     <div id="all-jobs"></div>
 </section>
 
-<!-- APPLICANT: Applied Jobs Section -->
-<section id="appliedJobsSection" style="display: none; padding: 20px;">
-    <h2 style="color: gold;">Your Applied Jobs</h2>
-    <ul id="appliedJobsList" style="list-style: none; padding: 0;"></ul>
-</section>
-
 <script>
 let currentUser = null;
 
@@ -232,44 +226,6 @@ function acceptApplicant(appId, jobId) {
     });
 }
 
-function fetchAppliedJobs() {
-    fetch("AuthServlet?action=getUserInfo", {
-        credentials: "include"
-    })
-    .then(res => res.json())
-    .then(user => {
-        if (!user.user_id) return;
-
-        fetch("AuthServlet", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: `action=getAppliedJobs&user_id=${user.user_id}`,
-            credentials: "include"
-        })
-        .then(res => res.json())
-        .then(data => {
-            const jobList = document.getElementById("appliedJobsList");
-            jobList.innerHTML = "";
-
-            if (data.jobs && data.jobs.length > 0) {
-                data.jobs.forEach(job => {
-                    const li = document.createElement("li");
-                    li.style.background = "#222";
-                    li.style.padding = "10px";
-                    li.style.border = "1px solid gold";
-                    li.style.borderRadius = "6px";
-                    li.style.marginBottom = "10px";
-                    li.innerText = `${job.title} at ${job.company} (${job.status})`;
-                    jobList.appendChild(li);
-                });
-            } else {
-                const li = document.createElement("li");
-                li.innerText = "No jobs applied yet.";
-                jobList.appendChild(li);
-            }
-        });
-    });
-}
 
 async function loadDashboard() {
     const res = await fetch("AuthServlet", {

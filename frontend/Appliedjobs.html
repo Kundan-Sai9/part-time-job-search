@@ -77,11 +77,12 @@
             text-align: left;
             margin-top: 30px;
             padding: 20px;
-            background: rgba(255, 215, 0, 0.1);
+            background: #1c1c1c; /* deep gray */
+			border: 1px solid #ff9800; /* orange */
             border-radius: 8px;
         }
         .applied-jobs-section h2 {
-            color: gold;
+            color:#ff5722;
             margin-bottom: 15px;
             font-weight: bold;
         }
@@ -93,8 +94,8 @@
         .applied-jobs-section li {
             padding: 10px;
             margin-bottom: 10px;
-            background: #222;
-            border: 1px solid gold;
+            background: #1c1c1c; /* deep gray */
+			border: 1px solid #ff9800; /* orange */
             border-radius: 6px;
             color: white;
             font-size: 1rem;
@@ -112,6 +113,7 @@
                     <li><a href="jobpost.html">Post Job</a></li>
                     <li><a href="account.html">Edit</a></li>
                     <li><a href="Appliedjobs.html">Applied Jobs</a></li>
+                    <li><a href="dashboard.html">Dashboard</a></li>
                     <li id="auth-menu">
                         <a href="login.html" id="auth-link">Login</a>
                     </li>
@@ -122,13 +124,18 @@
 
     <main>
         <section class="content">
-            <h1>Your Applied Jobs</h1>
+            <h1>Applied Jobs & Approved Jobs</h1>
             <p>View the jobs you have applied for.</p>
         </section>
 
         <section class="applied-jobs-section">
             <h2>Applied Jobs</h2>
             <ul id="appliedJobsList"></ul>
+        </section>
+
+        <section class="applied-jobs-section">
+            <h2>Your Approved Jobs</h2>
+            <ul id="appliedJobsListApproved"></ul>
         </section>
     </main>
 
@@ -147,6 +154,7 @@
                     currentUser = data.user_id;
                     authMenu.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
                     fetchAppliedJobs(); // Ensure applied jobs load after login
+                    fetchApprovedJobs();
                 }
             })
             .catch(error => console.error("Error checking login status:", error));
@@ -191,7 +199,37 @@
                 alert("Error fetching applied jobs. Check console for details.");
             });
         }
+        function fetchApprovedJobs() {
+            fetch("AppliedJobsServlet?action=getApprovedJobs", {
+                method: "GET",
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                const jobList = document.getElementById("appliedJobsListApproved");
+                jobList.innerHTML = "";
 
+                if (data.length > 0) {
+                    data.forEach(job => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `
+                            <strong>${job.title}</strong> at <em>${job.company}</em><br>
+                            Location: ${job.location}<br>
+                            Salary: &#8377;${job.salary.toLocaleString()}
+                        `;
+                        jobList.appendChild(li);
+                    });
+                } else {
+                    const li = document.createElement("li");
+                    li.innerText = "You have not been accepted to any approved jobs yet.";
+                    jobList.appendChild(li);
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching approved jobs:", error);
+                alert("Error fetching approved jobs. Please try again later.");
+            });
+        }
         function logout() {
             fetch("AuthServlet?action=logout", {
                 method: "POST",

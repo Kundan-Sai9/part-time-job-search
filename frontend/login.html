@@ -64,6 +64,15 @@
         .switch-form a:hover {
             text-decoration: underline;
         }
+        /* Checkbox label */
+        label.show-password-label {
+            color: gold;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: block;
+            margin-top: 5px;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
@@ -78,6 +87,11 @@
                 <input type="text" id="signup-username" placeholder="Username" required><br>
                 <input type="email" id="signup-email" placeholder="Email Address" required><br>
                 <input type="password" id="signup-password" placeholder="Password" required><br>
+                <input type="password" id="signup-confirm-password" placeholder="Confirm Password" required><br>
+                <label class="show-password-label">
+                    <input type="checkbox" id="show-passwords" />
+                    Show Passwords
+                </label>
                 <button type="submit">Sign Up</button>
             </form>
             <div class="switch-form">
@@ -101,57 +115,89 @@
 
     <script>
         // Toggle between signup and login forms
-        const signupForm = document.getElementById('signup-form');
-        const loginForm = document.getElementById('login-form');
+        const signupFormSection = document.getElementById('signup-form');
+        const loginFormSection = document.getElementById('login-form');
         const toLogin = document.getElementById('to-login');
         const toSignup = document.getElementById('to-signup');
 
-        toLogin.addEventListener('click', function() {
-            signupForm.classList.remove('active');
-            loginForm.classList.add('active');
+        toLogin.addEventListener('click', function(event) {
+            event.preventDefault();
+            signupFormSection.classList.remove('active');
+            loginFormSection.classList.add('active');
         });
 
-        toSignup.addEventListener('click', function() {
-            loginForm.classList.remove('active');
-            signupForm.classList.add('active');
+        toSignup.addEventListener('click', function(event) {
+            event.preventDefault();
+            loginFormSection.classList.remove('active');
+            signupFormSection.classList.add('active');
         });
 
         // Show the signup form by default
-        signupForm.classList.add('active');
+        signupFormSection.classList.add('active');
+
+        // Show/hide passwords toggle
+        const passwordInput = document.getElementById('signup-password');
+        const confirmPasswordInput = document.getElementById('signup-confirm-password');
+        const showPasswordsCheckbox = document.getElementById('show-passwords');
+
+        showPasswordsCheckbox.addEventListener('change', () => {
+            const type = showPasswordsCheckbox.checked ? 'text' : 'password';
+            passwordInput.type = type;
+            confirmPasswordInput.type = type;
+        });
 
         // Handle signup submission
         document.getElementById("signupForm").addEventListener("submit", function(event) {
             event.preventDefault();
-            let fullName = document.getElementById("signup-name").value;
-            let username = document.getElementById("signup-username").value;
-            let email = document.getElementById("signup-email").value;
-            let password = document.getElementById("signup-password").value;
+
+            let fullName = document.getElementById("signup-name").value.trim();
+            let username = document.getElementById("signup-username").value.trim();
+            let email = document.getElementById("signup-email").value.trim();
+            let password = passwordInput.value;
+            let confirmPassword = confirmPasswordInput.value;
+
+            // Frontend password confirmation check
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            // Optional frontend password length check
+            if (password.length < 8) {
+                alert("Password must be at least 8 characters long.");
+                return;
+            }
 
             fetch("AuthServlet?action=signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `full_name=${fullName}&username=${username}&email=${email}&password=${password}`
+                body: `full_name=${encodeURIComponent(fullName)}&username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&confirm_password=${encodeURIComponent(confirmPassword)}`
             })
             .then(response => response.json())
             .then(data => {
                 alert(data.message || data.error);
                 if (!data.error) {
-                    loginForm.classList.add('active');
-                    signupForm.classList.remove('active');
+                    loginFormSection.classList.add('active');
+                    signupFormSection.classList.remove('active');
                 }
+            })
+            .catch(err => {
+                alert("Signup request failed.");
+                console.error(err);
             });
         });
 
         // Handle login submission
         document.getElementById("loginForm").addEventListener("submit", function(event) {
             event.preventDefault();
-            let userInput = document.getElementById("login-input").value;
+
+            let userInput = document.getElementById("login-input").value.trim();
             let password = document.getElementById("login-password").value;
 
             fetch("AuthServlet?action=login", {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `user_input=${userInput}&password=${password}`
+                body: `user_input=${encodeURIComponent(userInput)}&password=${encodeURIComponent(password)}`
             })
             .then(response => response.json())
             .then(data => {
@@ -162,6 +208,10 @@
                     sessionStorage.setItem("user_id", data.user_id);
                     window.location.href = "home.html";
                 }
+            })
+            .catch(err => {
+                alert("Login request failed.");
+                console.error(err);
             });
         });
     </script>
