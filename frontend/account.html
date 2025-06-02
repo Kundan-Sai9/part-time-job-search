@@ -17,7 +17,6 @@
             width: 100%;
             color: white;
             padding: 20px;
-            text-align: center;
             font-size: 2rem;
             display: flex;
             justify-content: space-between;
@@ -42,6 +41,8 @@
             list-style: none;
             display: flex;
             gap: 20px;
+            padding: 0;
+            margin: 0;
         }
 
         nav ul li a {
@@ -57,7 +58,7 @@
         }
 
         main {
-            padding: 40px 20px;
+            padding: 40px 20px 60px;
             max-width: 900px;
             margin: auto;
         }
@@ -121,9 +122,65 @@
             border-left: 5px solid gold;
         }
 
+        #notification-message {
+            position: fixed;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.15rem;
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
+            opacity: 0;
+            pointer-events: none;
+            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.5s ease;
+            z-index: 1000;
+            max-width: 90%;
+            min-width: 280px;
+        }
+
+        #notification-message.show {
+            top: 20px;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #notification-message.error {
+            background-color: #e53935;
+            box-shadow: 0 8px 20px rgba(229, 57, 53, 0.6);
+        }
+
+        #notification-message .message-text {
+            flex-grow: 1;
+        }
+
+        #notification-message .close-btn {
+            cursor: pointer;
+            font-size: 1.4rem;
+            font-weight: bold;
+            border: none;
+            background: transparent;
+            color: white;
+            line-height: 1;
+            padding: 0;
+            transition: color 0.3s ease;
+        }
+
+        #notification-message .close-btn:hover {
+            color: #bbb;
+        }
+
         @media (max-width: 768px) {
             nav ul {
                 flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
             }
 
             .nav-container {
@@ -151,6 +208,11 @@
         </nav>
     </div>
 </header>
+
+<div id="notification-message">
+    <span class="message-text"></span>
+    <button class="close-btn" onclick="hideNotification()">×</button>
+</div>
 
 <main>
     <h1>My Account</h1>
@@ -186,6 +248,18 @@
 
 <script>
     let currentUser = null;
+
+    function showNotification(message, isError = false) {
+        const box = document.getElementById("notification-message");
+        box.querySelector(".message-text").textContent = message;
+        box.className = isError ? "show error" : "show";
+        setTimeout(hideNotification, 4000);
+    }
+
+    function hideNotification() {
+        const box = document.getElementById("notification-message");
+        box.className = "";
+    }
 
     function logout() {
         fetch("AuthServlet?action=logout", {
@@ -234,8 +308,10 @@
         })
         .then(res => res.json())
         .then(data => {
-            alert(data.message || data.error);
-            if (!data.error) window.location.reload();
+            showNotification(data.message || data.error, !!data.error);
+            if (!data.error) {
+                setTimeout(() => location.reload(), 1500);
+            }
         });
     });
 
@@ -256,7 +332,6 @@
             data.forEach(job => {
                 const div = document.createElement("div");
                 div.className = "job-card";
-
                 div.innerHTML = `
                     <label>Title</label>
                     <input type="text" id="title-${job.job_id}" value="${job.title}">
@@ -293,7 +368,7 @@
         })
         .then(res => res.json())
         .then(data => {
-            alert(data.message || data.error);
+            showNotification(data.message || data.error, !!data.error);
             if (!data.error) fetchPostedJobs();
         });
     }

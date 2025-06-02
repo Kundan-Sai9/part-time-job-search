@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>User Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -84,12 +84,53 @@
             font-size: 1.2rem;
             margin-top: 10px;
         }
-    </style>
+
+        /* Notification banner styles */
+        #notification-banner {
+            display: none;
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            max-width: 600px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1rem;
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.7);
+            text-align: center;
+        }
+        #notification-banner.success {
+            background-color: #4CAF50; /* green */
+            color: white;
+        }
+        #notification-banner.error {
+            background-color: #f44336; /* red */
+            color: white;
+        }
+
+        /* Button styles inside cards */
+        button {
+            background-color: #ff5722;
+            border: none;
+            padding: 8px 12px;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #e64a19;
+        }
+    </style>-->
 </head>
 <body>
 <header>
     <div class="nav-container">
-        <img src="part-time.png" alt="logo" class="logo-img">
+        <img src="part-time.png" alt="logo" class="logo-img" />
         <nav>
             <ul>
                 <li><a href="home.html">Home</a></li>
@@ -103,6 +144,9 @@
         </nav>
     </div>
 </header>
+
+<!-- Notification banner container -->
+<div id="notification-banner"></div>
 
 <div id="details" style="margin-top: 40px; padding: 20px;"></div>
 
@@ -120,6 +164,19 @@
 <script>
 let currentUser = null;
 
+// Notification banner helper
+function showNotification(message, type = "success", duration = 3000) {
+    const banner = document.getElementById("notification-banner");
+    banner.textContent = message;
+    banner.className = ""; // reset classes
+    banner.classList.add(type);
+    banner.style.display = "block";
+
+    setTimeout(() => {
+        banner.style.display = "none";
+    }, duration);
+}
+
 function logoutUser() {
     fetch("AuthServlet", {
         method: "POST",
@@ -131,8 +188,11 @@ function logoutUser() {
         if (response.ok) {
             window.location.href = "home.html";
         } else {
-            alert("Logout failed.");
+            showNotification("Logout failed.", "error");
         }
+    })
+    .catch(() => {
+        showNotification("Network error during logout.", "error");
     });
 }
 
@@ -155,6 +215,9 @@ function checkLoginStatus() {
             logoutMenu.style.display = "none";
             window.location.href = "login.html";
         }
+    })
+    .catch(() => {
+        showNotification("Failed to verify login status.", "error");
     });
 }
 
@@ -211,6 +274,10 @@ function fetchAllApplications() {
 
             container.appendChild(div);
         });
+    })
+    .catch(() => {
+        showNotification("Failed to load applications.", "error");
+        container.innerHTML = "<p>Error loading applications.</p>";
     });
 }
 
@@ -221,43 +288,59 @@ function acceptApplicant(appId, jobId) {
     })
     .then(res => res.json())
     .then(data => {
-        if (data.success) fetchAllApplications();
-        else alert(data.error || "Error accepting applicant.");
+        if (data.success) {
+            showNotification("Applicant accepted successfully.");
+            fetchAllApplications();
+        } else {
+            showNotification(data.error || "Error accepting applicant.", "error");
+        }
+    })
+    .catch(() => {
+        showNotification("Network error accepting applicant.", "error");
     });
 }
 
-
 async function loadDashboard() {
-    const res = await fetch("AuthServlet", {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: "action=dashboard",
-        credentials: "include"
-    });
+    try {
+        const res = await fetch("AuthServlet", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "action=dashboard",
+            credentials: "include"
+        });
 
-    const data = await res.json();
-    const statsDiv = document.getElementById("stats");
-    statsDiv.innerHTML = "";
+        const data = await res.json();
+        const statsDiv = document.getElementById("stats");
+        statsDiv.innerHTML = "";
 
-    function card(value, label) {
-        return `<div class="card"><h2>${value}</h2><div class="label">${label}</div></div>`;
-    }
+        function card(value, label) {
+            return `<div class="card"><h2>${value}</h2><div class="label">${label}</div></div>`;
+        }
 
-    if (data.role === "poster") {
-        statsDiv.innerHTML += card(data.jobs_posted, "Jobs Posted");
-        statsDiv.innerHTML += card(data.total_applicants, "Applicants");
-        statsDiv.innerHTML += card(data.total_accepted, "Accepted");
+        if (data.role === "poster") {
+            statsDiv.innerHTML += card(data.jobs_posted, "Jobs Posted");
+            statsDiv.innerHTML += card(data.total_applicants, "Applicants");
+            statsDiv.innerHTML += card(data.total_accepted, "Accepted");
 
-        document.getElementById("allApplicationsSection").style.display = "block";
-        fetchAllApplications();
-    } else {
-        statsDiv.innerHTML += card(data.applied, "Jobs Applied");
-        statsDiv.innerHTML += card(data.pending, "Pending");
-        statsDiv.innerHTML += card(data.accepted, "Accepted");
-        statsDiv.innerHTML += card(data.rejected, "Rejected");
+            document.getElementById("allApplicationsSection").style.display = "block";
+            fetchAllApplications();
+        } else {
+            statsDiv.innerHTML += card(data.applied, "Jobs Applied");
+            statsDiv.innerHTML += card(data.pending, "Pending");
+            statsDiv.innerHTML += card(data.accepted, "Accepted");
+            statsDiv.innerHTML += card(data.rejected, "Rejected");
 
-        document.getElementById("appliedJobsSection").style.display = "block";
-        fetchAppliedJobs();
+            // Make sure appliedJobsSection exists in your HTML or handle differently if missing
+            const appliedSection = document.getElementById("appliedJobsSection");
+            if (appliedSection) {
+                appliedSection.style.display = "block";
+            }
+            if (typeof fetchAppliedJobs === "function") {
+                fetchAppliedJobs();
+            }
+        }
+    } catch {
+        showNotification("Failed to load dashboard.", "error");
     }
 }
 

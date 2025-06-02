@@ -1,105 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8" />
     <title>Applied Jobs</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: black;
-            margin: 0;
-            padding: 0;
-            color: white;
-        }
-        header {
-            background: #ff5722;
-            width:100%;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0px 4px 10px rgba(255, 87, 34, 0.5);
-        }
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 0 20px;
-        }
-        .logo-img {
-            width: 100px;
-            height: auto;
-        }
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-        }
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.2rem;
-            transition: color 0.3s;
-        }
-        nav ul li a:hover {
-            color: black;
-        }
-        .content {
-            text-align: center;
-            padding: 50px 20px;
-        }
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            padding: 50px;
-            max-width: 1200px;
-            margin: auto;
-        }
-        .card {
-            background: #222;
-            padding: 20px;
-            border-radius: 10px;
-            width: 300px;
-            text-align: center;
-            box-shadow: 0px 4px 10px rgba(255, 87, 34, 0.5);
-        }
-        .card .title {
-            font-size: 1.5rem;
-            color: #ff5722;
-        }
-        .applied-jobs-section {
-            text-align: left;
-            margin-top: 30px;
-            padding: 20px;
-            background: #1c1c1c; /* deep gray */
-			border: 1px solid #ff9800; /* orange */
-            border-radius: 8px;
-        }
-        .applied-jobs-section h2 {
-            color:#ff5722;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-        .applied-jobs-section ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        .applied-jobs-section li {
-            padding: 10px;
-            margin-bottom: 10px;
-            background: #1c1c1c; /* deep gray */
-			border: 1px solid #ff9800; /* orange */
-            border-radius: 6px;
-            color: white;
-            font-size: 1rem;
-        }
+    <link rel="stylesheet" href="styles.css">
+
+<style>
+ .wrapper {
+    max-width: 1200px;  /* Adjust as needed */
+    margin: 0 auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+        
     </style>
 </head>
 <body>
@@ -121,8 +34,14 @@
             </nav>
         </div>
     </header>
+    <div id="notification-message" role="alert" aria-live="assertive" aria-atomic="true">
+  <span class="icon">✔️</span>
+  <span class="message-text"></span>
+  <button type="button" class="close-btn" aria-label="Close notification">&times;</button>
+</div>
 
     <main>
+    <div class="wrapper">
         <section class="content">
             <h1>Applied Jobs & Approved Jobs</h1>
             <p>View the jobs you have applied for.</p>
@@ -137,6 +56,7 @@
             <h2>Your Approved Jobs</h2>
             <ul id="appliedJobsListApproved"></ul>
         </section>
+        </div>
     </main>
 
     <script>
@@ -155,12 +75,47 @@
                     authMenu.innerHTML = `<a href="#" onclick="logout()">Logout</a>`;
                     fetchAppliedJobs(); // Ensure applied jobs load after login
                     fetchApprovedJobs();
+                }else {
+                    // 🔁 Redirect if not logged in
+                    window.location.href = "login.html";
                 }
             })
             .catch(error => console.error("Error checking login status:", error));
         }
 
+        function showNotification(message, isError = false) {
+        	  const notif = document.getElementById("notification-message");
 
+        	  // Clear previous timeout if any
+        	  if (notif.hideTimeout) {
+        	    clearTimeout(notif.hideTimeout);
+        	  }
+
+        	  // Set message text and styles
+        	  notif.querySelector(".message-text").textContent = message;
+        	  notif.classList.toggle("error", isError);
+        	  notif.classList.add("show");
+
+        	  // Show proper icon
+        	  notif.querySelector(".icon").textContent = isError ? "❌" : "✔️";
+
+        	  // Auto hide after 3 seconds
+        	  notif.hideTimeout = setTimeout(() => {
+        	    notif.classList.remove("show");
+        	  }, 3000);
+        	}
+
+        	// Close button event listener
+        	document.addEventListener("DOMContentLoaded", () => {
+        	  const closeBtn = document.querySelector("#notification-message .close-btn");
+        	  closeBtn.addEventListener("click", () => {
+        	    const notif = document.getElementById("notification-message");
+        	    notif.classList.remove("show");
+        	    if (notif.hideTimeout) clearTimeout(notif.hideTimeout);
+        	  });
+        	});
+        	
+        	
         function fetchAppliedJobs() {
             if (!currentUser) {
                 console.log("No user is logged in.");
@@ -185,7 +140,16 @@
                 if (data.jobs && data.jobs.length > 0) {
                     data.jobs.forEach(job => {
                         let li = document.createElement("li");
-                        li.innerText = `${job.title} at ${job.company}`;
+                        li.style.display = "flex";
+                        li.style.justifyContent = "space-between";
+                        li.style.alignItems = "center";
+
+                        li.innerHTML = `
+                            <span>${job.title} at ${job.company}</span>
+                            <button onclick="deleteApplication(${job.application_id})" style="color:white; background:red; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">
+                                Delete
+                            </button>
+                        `;
                         jobList.appendChild(li);
                     });
                 } else {
@@ -196,9 +160,13 @@
             })
             .catch(error => {
                 console.error("Error fetching applied jobs:", error);
-                alert("Error fetching applied jobs. Check console for details.");
+                showNotification("Error fetching applied jobs. Check console for details.");
             });
         }
+
+
+        
+        
         function fetchApprovedJobs() {
             fetch("AppliedJobsServlet?action=getApprovedJobs", {
                 method: "GET",
@@ -227,9 +195,32 @@
             })
             .catch(error => {
                 console.error("Error fetching approved jobs:", error);
-                alert("Error fetching approved jobs. Please try again later.");
+                showNotification("Error fetching approved jobs. Please try again later.");
             });
         }
+        
+        function deleteApplication(applicationId) {
+    
+            fetch(`AppliedJobsServlet?action=deleteApplication&applicationId=${applicationId}`, {
+                method: "GET", // ← change DELETE to GET
+                credentials: "include"
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                	showNotification("Application deleted successfully.");
+                    fetchAppliedJobs(); // Refresh the list
+                } else {
+                	showNotification("Failed to delete application: " + (data.error || "Unknown error"));
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting application:", error);
+                showNotification("Error deleting application.");
+            });
+        }
+
+        
         function logout() {
             fetch("AuthServlet?action=logout", {
                 method: "POST",

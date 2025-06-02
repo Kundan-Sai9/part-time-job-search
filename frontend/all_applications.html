@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8" />
     <title>All Applications</title>
     <style>
         body {
@@ -8,6 +9,7 @@
             color: white;
             font-family: Arial, sans-serif;
             padding: 20px;
+            margin: 0;
         }
         h1 {
             color: orange;
@@ -54,8 +56,46 @@
             background: gray;
             cursor: not-allowed;
         }
+        /* Notification Banner */
+        #notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            min-width: 300px;
+            max-width: 90%;
+            padding: 15px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1rem;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            text-align: center;
+        }
+        #notification.success {
+            background-color: #4CAF50; /* green */
+            color: white;
+        }
+        #notification.error {
+            background-color: #f44336; /* red */
+            color: white;
+        }
     </style>
     <script>
+        // Show notification banner
+        function showNotification(message, type = "success", duration = 3000) {
+            const notif = document.getElementById("notification");
+            notif.textContent = message;
+            notif.className = ""; // reset classes
+            notif.classList.add(type);
+            notif.style.display = "block";
+
+            setTimeout(() => {
+                notif.style.display = "none";
+            }, duration);
+        }
+
         async function fetchAllApplications() {
             const container = document.getElementById("all-jobs");
             container.innerHTML = "<p>Loading...</p>";
@@ -64,6 +104,7 @@
                 const res = await fetch("AppliedJobsServlet?action=getAllPostedApplications", {
                     credentials: "include"
                 });
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
                 const data = await res.json();
 
                 container.innerHTML = "";
@@ -108,9 +149,36 @@
             }
         }
 
-        function acceptApplicant(appId, jobId) {
+        async function acceptApplicant(appId, jobId) {
             if (!confirm("Accept this applicant? This action is final.")) return;
-            window.location.href = `AppliedJobsServlet?action=acceptApplicant&applicationId=${appId}&jobId=${jobId}`;
+
+            // Disable all buttons while processing
+            document.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
+            try {
+                // Send accept request via fetch for smoother UX
+                const response = await fetch(`AppliedJobsServlet?action=acceptApplicant&applicationId=${appId}&jobId=${jobId}`, {
+                    method: "POST",
+                    credentials: "include"
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification("Applicant accepted successfully!", "success");
+                    // Refresh the applications list to update UI
+                    fetchAllApplications();
+                } else {
+                    showNotification(result.message || "Failed to accept applicant.", "error");
+                    // Re-enable buttons on failure
+                    document.querySelectorAll('button').forEach(btn => btn.disabled = false);
+                }
+            } catch (error) {
+                showNotification("Error processing request: " + error.message, "error");
+                document.querySelectorAll('button').forEach(btn => btn.disabled = false);
+            }
         }
 
         window.onload = fetchAllApplications;
@@ -118,6 +186,11 @@
 </head>
 <body>
     <h1>All Applications for Your Posted Jobs</h1>
+
+    <!-- Notification Banner -->
+    <div id="notification"></div>
+
     <div id="all-jobs"></div>
 </body>
 </html>
+ 	

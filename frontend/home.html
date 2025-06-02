@@ -1,179 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: black;
-            margin: 0;
-            padding: 0;
-            color: white;
-        }
-        header {
-            background: #ff5722;
-            width:100%;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0px 4px 10px rgba(255, 87, 34, 0.5);
-        }
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 0 20px;
-        }
-        .logo-img {
-            width: 100px;
-            height: auto;
-        }
-        nav ul {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-        }
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.2rem;
-            transition: color 0.3s;
-        }
-        nav ul li a:hover {
-            color: black;
-        }
-        
-        .content {
-            text-align: center;
-            padding: 50px 20px;
-        }
-        .content h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-        .content p {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-        }
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            padding: 50px;
-            max-width: 1200px;
-            margin: auto;
-        }
-        .card {
-    background-color: #222;
-    color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(255, 69, 0, 0.5);
-    text-align: center;
-    width: 300px;
-    margin: 15px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-        .card .title {
-    font-size: 22px;
-    color: #ff4500;
-    font-weight: bold;
-}
-
-         	
-        .search-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px; /* Adds space between elements */
-    margin: 30px auto;
-    padding: 10px;
-    max-width: 800px;
-    flex-wrap: wrap; /* Makes it wrap on smaller screens */
-}
-
-.search-container input {
-    flex: 1;
-    min-width: 200px; /* Ensures inputs don't shrink too much */
-    padding: 12px 15px;
-    font-size: 1rem;
-    border: 2px solid #ff5722;
-    border-radius: 25px;
-    outline: none;
-    background: #222;
-    color: white;
-}
-
-.search-container button {
-    padding: 12px 20px;
-    font-size: 1rem;
-    background: #ff5722;
-    color: white;
-    border: 2px solid #ff5722;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: background 0.3s;
-    white-space: nowrap;
-}
-
-.search-container button:hover {
-    background: #e64a19;
-}
-.applied-jobs-section {
-    text-align: left;
-    margin-top: 30px;
-    padding: 20px;
-    background: rgba(255, 215, 0, 0.1);
-    border-radius: 8px;
-}
-
-.applied-jobs-section h2 {
-    color: gold;
-    margin-bottom: 15px;
-    font-weight: bold;
-}
-
-.applied-jobs-section ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.applied-jobs-section li {
-    padding: 10px;
-    margin-bottom: 10px;
-    background: #222;
-    border: 1px solid gold;
-    border-radius: 6px;
-    color: white;
-    font-size: 1rem;
-}
-.apply-btn {
-    background-color: #ff5722;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    cursor: pointer;
-    font-size: 14px;
-    border-radius: 5px;
-}
-
-.apply-btn:hover {
-    background-color: #e64a19;
-}
-
-
-
-    </style>
+<meta charset="UTF-8" />
+  <title>Home</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
@@ -188,12 +18,20 @@
           <li><a href="dashboard.html">Dashboard</a></li>
           <li id="auth-menu"><a href="login.html" id="auth-link">Login</a></li>
           <li id="logout-menu" style="display: none;">
-            <a href="#" class="nav-link" onclick="logoutUser()">Logout</a>
+            <a href="#" class="nav-link" id="logout-link">Logout</a>
           </li>
         </ul>
       </nav>
     </div>
   </header>
+
+  <!-- Notification container -->
+  <div id="notification-message" role="alert" aria-live="assertive" aria-atomic="true">
+  <span class="icon">✔️</span>
+  <span class="message-text"></span>
+  <button type="button" class="close-btn" aria-label="Close notification">&times;</button>
+</div>
+
 
   <main>
     <section class="content">
@@ -203,7 +41,7 @@
 
     <div class="search-container">
       <input type="text" id="search-input" placeholder="Search jobs..." />
-      <button onclick="searchJobs()">Search</button>
+      <button id="search-btn">Search</button>
     </div>
 
     <div class="container" id="jobs-container">
@@ -214,36 +52,74 @@
   <script>
     let currentUser = null;
 
+    // Show notification (message, isError=false)
+    function showNotification(message, isError = false) {
+  const notif = document.getElementById("notification-message");
+
+  // Clear previous timeout if any
+  if (notif.hideTimeout) {
+    clearTimeout(notif.hideTimeout);
+  }
+
+  // Set message text and styles
+  notif.querySelector(".message-text").textContent = message;
+  notif.classList.toggle("error", isError);
+  notif.classList.add("show");
+
+  // Show proper icon
+  notif.querySelector(".icon").textContent = isError ? "❌" : "✔️";
+
+  // Auto hide after 3 seconds
+  notif.hideTimeout = setTimeout(() => {
+    notif.classList.remove("show");
+  }, 3000);
+}
+
+// Close button event listener
+document.addEventListener("DOMContentLoaded", () => {
+  const closeBtn = document.querySelector("#notification-message .close-btn");
+  closeBtn.addEventListener("click", () => {
+    const notif = document.getElementById("notification-message");
+    notif.classList.remove("show");
+    if (notif.hideTimeout) clearTimeout(notif.hideTimeout);
+  });
+});
+
+
+    // Check login status & update UI
     function checkLoginStatus() {
       fetch("AuthServlet?action=getUserInfo", {
         method: "GET",
         credentials: "include"
       })
-        .then(response => response.json())
-        .then(data => {
-          let authMenu = document.getElementById("auth-menu");
-          let logoutMenu = document.getElementById("logout-menu");
+      .then(response => response.json())
+      .then(data => {
+        const authMenu = document.getElementById("auth-menu");
+        const logoutMenu = document.getElementById("logout-menu");
 
-          if (data.user_id) {
-            currentUser = data.user_id;
-            authMenu.innerHTML = `
-              <div>
-                <a href="#" id="account-link">${data.full_name}</a>
-              </div>
-            `;
-            logoutMenu.style.display = "inline";
-          } else {
-            logoutMenu.style.display = "none";
-          }
-        })
-        .catch(error => console.error("Error checking login status:", error));
+        if (data.user_id) {
+          currentUser = data.user_id;
+          authMenu.innerHTML = `
+            <div>
+              <a href="#" id="account-link">${data.full_name}</a>
+            </div>
+          `;
+          logoutMenu.style.display = "inline";
+        } else {
+          currentUser = null;
+          authMenu.innerHTML = `<a href="login.html" id="auth-link">Login</a>`;
+          logoutMenu.style.display = "none";
+        }
+      })
+      .catch(error => console.error("Error checking login status:", error));
     }
 
+    // Load all jobs and display
     function loadJobs() {
       fetch("JobServlet")
         .then(response => response.json())
         .then(data => {
-          let jobContainer = document.getElementById("jobs-container");
+          const jobContainer = document.getElementById("jobs-container");
           jobContainer.innerHTML = "";
 
           if (!Array.isArray(data) || data.length === 0) {
@@ -252,22 +128,21 @@
           }
 
           data.forEach(job => {
-            let jobCard = document.createElement("div");
+            const jobCard = document.createElement("div");
             jobCard.classList.add("card");
 
-            let actions = "";
+            // Prepare apply button
+            const applyBtn = document.createElement("button");
+            applyBtn.classList.add("apply-btn");
+
             if (currentUser === job.posted_by) {
-              actions += `
-                <button class="apply-btn" disabled style="background: gray; cursor: not-allowed;">
-                  You Posted This
-                </button>
-              `;
+              applyBtn.textContent = "You Posted This";
+              applyBtn.disabled = true;
+              applyBtn.style.background = "gray";
+              applyBtn.style.cursor = "not-allowed";
             } else {
-              actions += `
-                <button class="apply-btn" onclick="applyForJob(${job.job_id})">
-                  Apply
-                </button>
-              `;
+              applyBtn.textContent = "Apply";
+              applyBtn.addEventListener("click", () => applyForJob(job.job_id));
             }
 
             jobCard.innerHTML = `
@@ -276,49 +151,45 @@
               <p><strong>Location:</strong> ${job.location}</p>
               <p><strong>Salary:</strong> ${job.salary}</p>
               <p>${job.description}</p>
-              ${actions}
             `;
-
+            jobCard.appendChild(applyBtn);
             jobContainer.appendChild(jobCard);
           });
         })
         .catch(error => console.error("Error fetching jobs:", error));
     }
 
+    // Search jobs with query from input
     function searchJobs() {
-      let searchQuery = document.getElementById("search-input").value.trim();
-      let queryParams = new URLSearchParams();
-      if (searchQuery) queryParams.append("search", searchQuery);
+      const searchInput = document.getElementById("search-input");
+      const searchQuery = searchInput.value.trim();
 
-      let requestURL = `JobServlet?${queryParams.toString()}`;
-      fetch(requestURL)
+      fetch(`JobServlet?search=${encodeURIComponent(searchQuery)}`)
         .then(response => response.json())
         .then(data => {
-          let jobContainer = document.getElementById("jobs-container");
+          const jobContainer = document.getElementById("jobs-container");
           jobContainer.innerHTML = "";
 
-          if (!data || data.length === 0) {
-            jobContainer.innerHTML = `<p style="color:white; text-align:center;">No jobs found.</p>`;
+          if (!Array.isArray(data) || data.length === 0) {
+            jobContainer.innerHTML = `<p style="color:white; text-align:center;">No jobs found for '${searchQuery}'.</p>`;
             return;
           }
 
           data.forEach(job => {
-            let jobCard = document.createElement("div");
+            const jobCard = document.createElement("div");
             jobCard.classList.add("card");
 
-            let actions = "";
+            const applyBtn = document.createElement("button");
+            applyBtn.classList.add("apply-btn");
+
             if (currentUser === job.posted_by) {
-              actions += `
-                <button class="apply-btn" disabled style="background: gray; cursor: not-allowed;">
-                  You Posted This
-                </button>
-              `;
+              applyBtn.textContent = "You Posted This";
+              applyBtn.disabled = true;
+              applyBtn.style.background = "gray";
+              applyBtn.style.cursor = "not-allowed";
             } else {
-              actions += `
-                <button class="apply-btn" onclick="applyForJob(${job.job_id})">
-                  Apply
-                </button>
-              `;
+              applyBtn.textContent = "Apply";
+              applyBtn.addEventListener("click", () => applyForJob(job.job_id));
             }
 
             jobCard.innerHTML = `
@@ -327,18 +198,21 @@
               <p><strong>Location:</strong> ${job.location}</p>
               <p><strong>Salary:</strong> ${job.salary}</p>
               <p>${job.description}</p>
-              ${actions}
             `;
-
+            jobCard.appendChild(applyBtn);
             jobContainer.appendChild(jobCard);
           });
         })
-        .catch(error => console.error("Error fetching jobs:", error));
+        .catch(error => {
+          console.error("Error searching jobs:", error);
+          showNotification("Search failed. Please try again.", true);
+        });
     }
 
+    // Apply for a job with jobId
     function applyForJob(jobId) {
       if (!currentUser) {
-        alert("You must be logged in to apply for a job.");
+        showNotification("You must be logged in to apply for a job.", true);
         return;
       }
 
@@ -347,36 +221,61 @@
         body: new URLSearchParams({ job_id: jobId, user_id: currentUser }),
         headers: { "Content-Type": "application/x-www-form-urlencoded" }
       })
-        .then(response => response.json())
-        .then(data => {
-          if (data.error) {
-            alert("Error: " + data.error);
-          } else {
-            alert(data.message);
-          }
-        })
-        .catch(error => console.error("Error applying:", error));
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          showNotification("Error: " + data.error, true);
+        } else {
+          showNotification(data.message || "Applied successfully!");
+        }
+      })
+      .catch(error => {
+        console.error("Error applying:", error);
+        showNotification("Failed to apply. Please try again.", true);
+      });
     }
 
-    function logoutUser() {
+    // Logout function
+    function logoutUser(event) {
+      event.preventDefault();
+
       fetch("AuthServlet", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: "action=logout",
         credentials: "include"
       })
-        .then(response => {
-          if (response.ok) {
+      .then(response => {
+        if (response.ok) {
+          showNotification("Logout successful! Redirecting to home...");
+          document.getElementById("logout-menu").style.display = "none";
+          document.getElementById("auth-menu").style.display = "inline";
+
+          setTimeout(() => {
             window.location.href = "home.html";
-          } else {
-            alert("Logout failed. Try again.");
-          }
-        })
-        .catch(error => console.error("Error logging out:", error));
+          }, 1500);
+        } else {
+          showNotification("Logout failed. Try again.", true);
+        }
+      })
+      .catch(error => {
+        console.error("Error logging out:", error);
+        showNotification("Logout failed. Try again.", true);
+      });
     }
 
-    checkLoginStatus();
-    loadJobs();
+    // Setup event listeners after DOM loaded
+    window.addEventListener("DOMContentLoaded", () => {
+      checkLoginStatus();
+      loadJobs();
+
+      document.getElementById("search-btn").addEventListener("click", searchJobs);
+
+      const logoutLink = document.getElementById("logout-link");
+      if (logoutLink) {
+        logoutLink.addEventListener("click", logoutUser);
+      }
+    });
   </script>
 </body>
 </html>
