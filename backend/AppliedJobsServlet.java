@@ -184,6 +184,40 @@ public class AppliedJobsServlet extends HttpServlet {
                 out.print(json.toString());
                 return;
             }
+            
+            else if ("deleteApplication".equals(action)) {
+                int appId = Integer.parseInt(request.getParameter("applicationId"));
+                int userId = Integer.parseInt(session.getAttribute("user_id").toString());
+
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter out = response.getWriter();
+
+                // Verify the application belongs to the user
+                PreparedStatement check = conn.prepareStatement(
+                    "SELECT * FROM applied_jobs WHERE application_id = ? AND user_id = ?");
+                check.setInt(1, appId);
+                check.setInt(2, userId);
+                ResultSet rs = check.executeQuery();
+
+                if (!rs.next()) {
+                    out.print("{\"error\": \"Unauthorized or application not found.\"}");
+                    return;
+                }
+
+                PreparedStatement delete = conn.prepareStatement(
+                    "DELETE FROM applied_jobs WHERE application_id = ?");
+                delete.setInt(1, appId);
+                int rows = delete.executeUpdate();
+
+                if (rows > 0) {
+                    out.print("{\"success\": true}");
+                } else {
+                    out.print("{\"error\": \"Failed to delete application.\"}");
+                }
+                return;
+            }
+
 
 
             else {

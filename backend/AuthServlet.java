@@ -488,7 +488,7 @@ public class AuthServlet extends HttpServlet {
             }
 
             PreparedStatement stmt = conn.prepareStatement(
-                "SELECT job_id, job_title, company, status FROM applied_jobs WHERE user_id = ?"
+                "SELECT job_id, application_id, job_title, company, status FROM applied_jobs WHERE user_id = ?"
             );
             stmt.setInt(1, userId);
             ResultSet rs = stmt.executeQuery();
@@ -497,13 +497,16 @@ public class AuthServlet extends HttpServlet {
             boolean first = true;
             while (rs.next()) {
                 if (!first) json.append(",");
-                json.append("{ \"job_id\": ").append(rs.getInt("job_id"))
-                    .append(", \"title\": \"").append(rs.getString("job_title"))
-                    .append("\", \"company\": \"").append(rs.getString("company"))
-                    .append("\", \"status\": \"").append(rs.getString("status"))
-                    .append("\" }");
+                json.append("{")
+                    .append("\"job_id\": ").append(rs.getInt("job_id")).append(", ")
+                    .append("\"application_id\": ").append(rs.getInt("application_id")).append(", ")
+                    .append("\"title\": \"").append(rs.getString("job_title").replace("\"", "\\\"")).append("\", ")
+                    .append("\"company\": \"").append(rs.getString("company").replace("\"", "\\\"")).append("\", ")
+                    .append("\"status\": \"").append(rs.getString("status")).append("\"")
+                    .append("}");
                 first = false;
             }
+
             json.append("] }");
 
             System.out.println("Applied Jobs JSON Response: " + json.toString()); // Debug Log

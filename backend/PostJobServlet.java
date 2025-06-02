@@ -14,13 +14,16 @@ import javax.servlet.http.HttpSession;
 @WebServlet("/PostJobServlet")
 public class PostJobServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html");
+        // Change 1: Set content type to JSON instead of HTML
+        response.setContentType("application/json"); // was "text/html"
         PrintWriter out = response.getWriter();
 
         // Check if user is logged in
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("user_id") == null) {
-            response.sendRedirect("login.html");
+            // Change 2: Respond with JSON error instead of redirect
+            out.print("{\"error\":true, \"message\":\"User not logged in.\"}");
+            out.flush();
             return;
         }
 
@@ -41,12 +44,16 @@ public class PostJobServlet extends HttpServlet {
             location == null || location.trim().isEmpty() ||
             description == null || description.trim().isEmpty()) {
             
-            out.println("<p style='color:red;'>All fields are required.</p>");
+            // Change 2: JSON error instead of HTML
+            out.print("{\"error\":true, \"message\":\"All fields are required.\"}");
+            out.flush();
             return;
         }
 
         if (salaryStr == null || salaryStr.trim().isEmpty()) {
-            out.println("<p style='color:red;'>Salary is required.</p>");
+            // Change 2: JSON error
+            out.print("{\"error\":true, \"message\":\"Salary is required.\"}");
+            out.flush();
             return;
         }
 
@@ -55,7 +62,9 @@ public class PostJobServlet extends HttpServlet {
 
             Connection conn = DBConnection.getConnection();
             if (conn == null) {
-                out.println("<p style='color:red;'>Database connection failed.</p>");
+                // Change 2: JSON error
+                out.print("{\"error\":true, \"message\":\"Database connection failed.\"}");
+                out.flush();
                 return;
             }
 
@@ -75,14 +84,21 @@ public class PostJobServlet extends HttpServlet {
             conn.close();
 
             if (rows > 0) {
-                response.sendRedirect("home.html"); // Redirect after success
+                // Change 3: JSON success message instead of redirect
+                out.print("{\"error\":false, \"message\":\"Job posted successfully!\"}");
             } else {
-                out.println("<p style='color:red;'>Failed to post job.</p>");
+                // Change 2: JSON error
+                out.print("{\"error\":true, \"message\":\"Failed to post job.\"}");
             }
+            out.flush();
         } catch (NumberFormatException e) {
-            out.println("<p style='color:red;'>Invalid salary format.</p>");
+            // Change 2: JSON error
+            out.print("{\"error\":true, \"message\":\"Invalid salary format.\"}");
+            out.flush();
         } catch (Exception e) {
-            out.println("<p style='color:red;'>Error: " + e.getMessage() + "</p>");
+            // Change 2: JSON error
+            out.print("{\"error\":true, \"message\":\"Error: " + e.getMessage() + "\"}");
+            out.flush();
         }
     }
 }
