@@ -7,8 +7,12 @@
 </head>
 <body>
   <header>
+  <!-- Inside <header> -->
+
     <div class="nav-container">
       <img src="part-time.png" alt="logo" class="logo-img" />
+      
+  
       <nav>
         <ul>
           <li><a href="home.html">Home</a></li>
@@ -22,6 +26,7 @@
           </li>
         </ul>
       </nav>
+      
     </div>
   </header>
 
@@ -34,6 +39,7 @@
 
 
   <main>
+  <button id="theme-toggle" aria-label="Toggle theme" class="theme-btn">🌞 Light</button>
     <section class="content">
       <h1>Welcome to Our Job Search Portal</h1>
       <p>Find the best opportunities that match your skills.</p>
@@ -276,6 +282,32 @@ document.addEventListener("DOMContentLoaded", () => {
         logoutLink.addEventListener("click", logoutUser);
       }
     });
+ // Theme toggle logic
+    const themeToggleBtn = document.getElementById("theme-toggle");
+
+  // Load saved theme
+  const savedTheme = localStorage.getItem("theme");
+  const toggled = localStorage.getItem("themeToggled") === "true";
+
+  if (savedTheme === "light") {
+    document.body.classList.add("light-theme");
+    if (toggled) {
+      document.body.classList.add("user-toggled");
+    }
+    themeToggleBtn.textContent = "🌙 Dark";
+  }
+
+  themeToggleBtn.addEventListener("click", () => {
+    const isLight = document.body.classList.toggle("light-theme");
+
+    // Track if the toggle was done manually
+    document.body.classList.add("user-toggled");
+    localStorage.setItem("themeToggled", "true");
+
+    themeToggleBtn.textContent = isLight ? "🌙 Dark" : "🌞 Light";
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+  });
+
   </script>
 </body>
 </html>
