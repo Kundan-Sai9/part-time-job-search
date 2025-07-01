@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Find your next career opportunity with JobMatch – smart, secure, and personalized job matching." />
+  <title>Find Your Next Opportunity | JobMatch</title>
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1950&q=80') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      line-height: 1.6;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* Navigation */
+    nav {
+      background-color: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      padding: 15px 30px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 20px;
+    }
+
+    nav a {
+      color: white;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #ff9800;
+    }
+
+    /* Hero Section */
+    .hero {
+      background: rgba(255, 87, 34, 0.7); /* transparent orange */
+      backdrop-filter: blur(10px);
+      text-align: center;
+      padding: 100px 20px;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      color: black;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.4rem;
+      color: #111;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      margin-top: 30px;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      border: 2px solid white;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .cta-btn:hover {
+      background: white;
+      color: black;
+    }
+
+    /* Section Titles */
+    section h2 {
+      color: #ff5722;
+      font-size: 2rem;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    /* Features Section */
+    .features {
+      padding: 60px 20px;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+    }
+
+    .feature-grid {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .feature-card {
+      background-color: rgba(34, 34, 34, 0.6);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 10px;
+      width: 250px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(255, 87, 34, 0.5);
+      transition: transform 0.3s ease;
+    }
+
+    .feature-card h3 {
+      color: gold;
+      margin-bottom: 10px;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+    }
+
+    /* How it Works Section */
+    .how-it-works {
+      padding: 60px 20px;
+      background-color: rgba(26, 26, 26, 0.6);
+      backdrop-filter: blur(8px);
+      text-align: center;
+    }
+
+    .how-it-works p {
+      margin: 10px 0;
+      font-size: 1.1rem;
+    }
+
+    /* Testimonials */
+    .testimonials {
+      padding: 60px 20px;
+      background-color: rgba(18, 18, 18, 0.6);
+      backdrop-filter: blur(8px);
+      text-align: center;
+    }
+
+    .testimonials p {
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+
+    /* Footer */
+    .footer {
+      background: rgba(0, 0, 0, 0.6);
+      color: #aaa;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9rem;
+      backdrop-filter: blur(6px);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+
+      .cta-btn {
+        font-size: 1rem;
+        padding: 12px 24px;
+      }
+
+      .feature-card {
+        width: 100%;
+        max-width: 300px;
+      }
+
+      nav {
+        flex-direction: column;
+        align-items: flex-end;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="#features">Features</a>
+    <a href="#how-it-works">How It Works</a>
+    <a href="home.html">Browse Jobs</a>
+  </nav>
+
+  <section class="hero">
+    <h1>Discover the Perfect Job for You</h1>
+    <p>Join thousands of professionals connecting with top companies.</p>
+    <a href="home.html" class="cta-btn">Start Browsing Jobs</a>
+  </section>
+
+  <section class="features" id="features">
+    <h2>Why Choose Us?</h2>
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h3>Tailored Matches</h3>
+        <p>Get job recommendations based on your skills and interests.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Easy Application</h3>
+        <p>Apply to jobs in just one click. Fast and efficient.</p>
+      </div>
+      <div class="feature-card">
+        <h3>Secure Platform</h3>
+        <p>Your data and privacy are our top priority.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="how-it-works" id="how-it-works">
+    <h2>How It Works</h2>
+    <p>1. Sign up for a free account</p>
+    <p>2. Search and apply to jobs</p>
+    <p>3. Track your applications and land your dream role!</p>
+  </section>
+
+
+  <div class="footer">
+    &copy; 2025 JobMatch. All rights reserved.
+  </div>
+
+</body>
+</html>
